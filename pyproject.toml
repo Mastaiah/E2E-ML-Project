@@ -1,7 +1,7 @@
 # tells pip what build tool to use to build your package
 
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0","setuptools-scm"]
 #Can be done in this way also
 #requires = ["setuptools>=61.0","python = '3.9'", {file = "requirements.txt", optional = false} ]  
 build-backend = "setuptools.build_meta"
