@@ -1,0 +1,27 @@
+# tells pip what build tool to use to build your package
+
+[build-system]
+requires = ["setuptools>=61.0"]
+#Can be done in this way also
+#requires = ["setuptools>=61.0","python = '3.9'", {file = "requirements.txt", optional = false} ]  
+build-backend = "setuptools.build_meta"
+
+# tells pip how to build your pypi webpage & what dependencies to install
+
+[project]
+name = "mlproject"
+version = "1.0.0"
+dynamic = ["dependencies","readme"]
+authors = [
+  { name="Niranjan Mastaiah", email="niranjan.mastaiah@gmail.com" }]
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+readme = {file = ["README.md"]}
+
