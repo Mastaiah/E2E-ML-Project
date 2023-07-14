@@ -13,4 +13,4 @@ To build package
 
 To install package in editable mode
 
-        pip install -e .
+    pip install -e .
