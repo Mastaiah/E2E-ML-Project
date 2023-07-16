@@ -15,20 +15,20 @@ _**To install package in editable mode**_
 
     pip install -e .
 
+<br></br>
+<p align="center">
+    <i><B>Machine Learning Flow</B></i><br>
+</p>
 
+<p align="center">
+  <img src="https://github.com/Mastaiah/E2E-ML-Project/assets/49465317/fb5a5d31-399e-43f0-a5ea-6be257ca4642" />
+</p>
 
-_**Machine Learning Flow**_
+<br></br>
 
+**The below cheat sheet will give you the various categorical encoding methods**
+<br></br>
+<p align="center">
+  <img src="https://github.com/Mastaiah/E2E-ML-Project/assets/49465317/4d979f3f-9c29-44b7-aacf-35e83ed867e8" />
+</p>
 
-
-
-![Machine Learning](https://github.com/Mastaiah/E2E-ML-Project/assets/49465317/fb5a5d31-399e-43f0-a5ea-6be257ca4642)
-
-
-
-
-
- _**Categorical Encoding Methods Cheat-Sheet**_
- 
-
-![Categorical Encoding Methods Cheat-Sheet](https://github.com/Mastaiah/E2E-ML-Project/assets/49465317/4d979f3f-9c29-44b7-aacf-35e83ed867e8)
