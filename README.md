@@ -14,3 +14,11 @@ To build package
 To install package in editable mode
 
     pip install -e .
+
+
+
+
+
+Categorical Encoding Methods Cheat-Sheet
+
+![Categorical Encoding Methods Cheat-Sheet](https://github.com/Mastaiah/E2E-ML-Project/assets/49465317/4d979f3f-9c29-44b7-aacf-35e83ed867e8)
