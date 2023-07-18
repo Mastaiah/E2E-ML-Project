@@ -1,34 +1,57 @@
 import logging 
 import os
+import inspect 
 from datetime import datetime
 
-#create a log path
-logs_path = os.path.join(os.getcwd(),"logs",f"{datetime.now().strftime('%d_%m_%Y')}")
-os.makedirs(logs_path,exist_ok=True)
 
-#Create a log file name
-LOG_FILE_NAME = f"{datetime.now().strftime('%d_%m_%Y-%H_%M_%S')}.log"
+def CustomLogger(loglevel = 'INFO'):
+    #Set class / method name from where its called
+    logger_name = inspect.stack()[1][3]
 
-LOG_FILE_PATH = os.path.join(logs_path,LOG_FILE_NAME)
+    #Create a custom logger
+    logger = logging.getLogger(logger_name)
 
-#Create a custom logger
-logger = logging.getLogger(__name__)
+    # if logger 'name' already exists, return it to avoid logging duplicate
+    # messages by attaching multiple handlers of the same type
+    if logger.handlers:
+        return logger
+    
+    # if logger 'name' does not already exist, create it and attach handlers
+    else:
+        #create a log path
+        log_dir = os.path.join(os.getcwd(),"logs",f"{datetime.now().strftime('%d_%m_%Y')}")
+        os.makedirs(log_dir,exist_ok=True)
 
-#Set a severity level of a logger
-logger.setLevel(logging.INFO)
+        #Storing it before getting converted in to intger 
+        #severity_level = loglevel
 
-#Create a formater
-fmt = logging.Formatter("%(asctime)s - [%(filename)s: %(lineno)s] - %(levelname)s : %(message)s", datefmt= ('%m-%d-%y::%H:%M:%S'))
+        #Create a log file name
+        LOG_FILE_NAME = f"{datetime.now().strftime('%d_%m_%Y')}.log"
+        LOG_FILE_PATH = os.path.join(log_dir,LOG_FILE_NAME)
+        
+        #getattr is important else will not write to log
+        loglevel = getattr(logging, loglevel.upper())
 
-#Create an handler
-handler = logging.FileHandler(LOG_FILE_PATH)
+        #Set a severity level of a logger
+        #loglevel = logging.INFO
+        logger.setLevel(loglevel)
+        
+        #Create a formater
+        fmt = logging.Formatter("%(asctime)s - [%(filename)s: %(lineno)s]  - %(levelname)s : %(message)s", datefmt= ('%m-%d-%y::%H:%M:%S'))
 
-#Set formatter to handler
-handler.setFormatter(fmt)
+        #Create an handler
+        handler = logging.FileHandler(LOG_FILE_PATH)
 
-#Add handler to the logger
-logger.addHandler(handler)
+        #Set formatter to handler
+        handler.setFormatter(fmt)
 
-#Set it as False to enable the logger and True to disable it
-logger.disabled = False
-logger.info("Logging Enabled . Enjoy !!!")
+        #Add handler to the logger
+        logger.addHandler(handler)
+
+        #Set it as False to enable the logger and True to disable it
+        #logger.disabled = False
+
+        return logger
+
+    
+    
