@@ -22,9 +22,6 @@ def CustomLogger(loglevel = 'INFO'):
         log_dir = os.path.join(os.getcwd(),"logs",f"{datetime.now().strftime('%d_%m_%Y')}")
         os.makedirs(log_dir,exist_ok=True)
 
-        #Storing it before getting converted in to intger 
-        #severity_level = loglevel
-
         #Create a log file name
         LOG_FILE_NAME = f"{datetime.now().strftime('%d_%m_%Y')}.log"
         LOG_FILE_PATH = os.path.join(log_dir,LOG_FILE_NAME)
@@ -53,5 +50,3 @@ def CustomLogger(loglevel = 'INFO'):
 
         return logger
 
-    
-    
