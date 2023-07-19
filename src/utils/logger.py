@@ -11,8 +11,9 @@ def CustomLogger(loglevel = 'INFO'):
     #Create a custom logger
     logger = logging.getLogger(logger_name)
 
-    # if logger 'name' already exists, return it to avoid logging duplicate
-    # messages by attaching multiple handlers of the same type
+    """if logger 'name' already exists, return it to avoid logging duplicate
+     messages by attaching multiple handlers of the same type.
+    logger.handlers attribute allows us to access and manipulate the list of handlers attached to a specific logger instance."""
     if logger.handlers:
         return logger
     
