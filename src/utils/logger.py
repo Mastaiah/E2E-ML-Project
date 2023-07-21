@@ -4,7 +4,7 @@ import inspect
 from datetime import datetime
 
 
-def CustomLogger(loglevel = 'INFO'):
+def CustomLogger(loglevel = 'DEBUG'):
     #Set class / method name from where its called
     logger_name = inspect.stack()[1][3]
 
@@ -21,7 +21,7 @@ def CustomLogger(loglevel = 'INFO'):
     else:
         #create a log path
         log_dir = os.path.join(os.getcwd(),"logs",f"{datetime.now().strftime('%d_%m_%Y')}")
-        os.makedirs(log_dir,exist_ok=True)
+        os.makedirs(log_dir, exist_ok = True)
 
         #Create a log file name
         LOG_FILE_NAME = f"{datetime.now().strftime('%d_%m_%Y')}.log"
