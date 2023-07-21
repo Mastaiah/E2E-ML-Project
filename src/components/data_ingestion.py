@@ -35,12 +35,14 @@ class DataIngestion:
                 CustomLogger().info('Train-Test split initated')
                 train_data , test_data = train_test_split(student_df, test_size = 0.2 , random_state = 42)
 
+                CustomLogger().info('Train-Test split completed')
                 # saving the DataFrame as a CSV file
                 train_data.to_csv(self.data_config.train_data_path, index = False, header = True) 
                 test_data.to_csv(self.data_config.test_data_path,  index = False, header = True)
                 student_df.to_csv(self.data_config.raw_data_path, index = False, header = True)
 
-                CustomLogger().info('Train-Test split completed')
+                
+                CustomLogger().info('Data ingestion completed')
 
                 return{
                     self.data_config.train_data_path,
@@ -54,11 +56,3 @@ class DataIngestion:
 if __name__ == "__main__":
     obj = DataIngestion()
     obj.initiate_data_ingestion()
-     
-
-                
-
-
-
-
-
