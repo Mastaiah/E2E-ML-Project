@@ -13,7 +13,7 @@ class ModelSelector:
         Parameters:
             X (array-like): Features (input variables).
             y (array-like): Target variable (output variable).
-            cv (int, optional): Number of cross-validation folds (default=5).
+            cv (int, optional): Number of cross-validation folds (if we use None it will set to default=5).
             scoring (str, optional): Scoring metric for evaluation (default='neg_mean_squared_error').
 
         Returns:

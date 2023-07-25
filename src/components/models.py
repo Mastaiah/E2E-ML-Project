@@ -27,9 +27,7 @@ models = {
     'Gradient Boosting': GradientBoostingRegressor(),
     'XGBoost Regressor' : XGBRegressor(),
     'CatBoosting Regressor' :CatBoostRegressor(verbose=False),
-    'AdaBoost Regressor': AdaBoostRegressor()
-   
-
+    'AdaBoost Regressor': AdaBoostRegressor(),
 }
 
 # Create a ModelManager instance with the models dictionary
