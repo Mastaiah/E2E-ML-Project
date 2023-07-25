@@ -162,5 +162,5 @@ cython_debug/
 #Artifacts folder
 artifacts
 
-#Cataboost_info folder
-cataboost_info
+#Catboost_info folder
+catboost_info
