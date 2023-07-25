@@ -1,12 +1,34 @@
+from dataclasses import dataclass
 from sklearn.model_selection import cross_val_score
+from sklearn.linear_model import LinearRegression
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.svm import SVR
+from sklearn.ensemble import (
+    AdaBoostRegressor,
+    GradientBoostingRegressor,
+    RandomForestRegressor,
+)
+from xgboost import XGBRegressor
+from catboost import CatBoostRegressor
+from typing import Dict
+import pandas as pd
+
+
+@dataclass
+class ModelManager:
+    models_list: Dict[str, object] 
+    
 
 class ModelSelector:
     def __init__(self, models):
         self.models = models
         self.best_model = None
         self.best_model_name = None
+        self.results = {}
+        self.df = None
 
-    def train_and_select_best_model(self, X, y, cv=5, scoring='neg_mean_squared_error'):
+    def train_and_select_best_model(self, X, y, cv=None, scoring='neg_mean_squared_error'):
         """
         Train different models on the data and select the best model based on cross-validation.
 
@@ -21,17 +43,57 @@ class ModelSelector:
         """
         best_score = float('-inf')
 
-        for model_name, model in self.models.items():
+        for model_name, model in self.models.models_list.items():
             scores = cross_val_score(model, X, y, cv=cv, scoring=scoring)
-            mean_score = scores.mean()
+            rmse_scores = np.sqrt(-scores)
+            mean_score = rmse_scores.mean()
+            self.results[model_name] = mean_score
+
 
             if mean_score > best_score:
                 best_score = mean_score
                 self.best_model = model
                 self.best_model_name = model_name
 
+        self.df = pd.DataFrame.from_dict(self.results ,orient='index',columns=['Value'])
+        self.df.reset_index(inplace=True)
+        self.df.rename(columns={'index': 'Model'}, inplace=True)
+       
+        return self.df
+
     def get_best_model(self):
         return self.best_model
 
     def get_best_model_name(self):
         return self.best_model_name
+    
+
+# Create a dictionary of candidate models
+models = {
+    'Random Forest': RandomForestRegressor(),
+    'Support Vector Machine': SVR(),
+    'Decision Tree' : DecisionTreeRegressor(),
+    'Gradient Boosting': GradientBoostingRegressor(),
+    'XGBoost Regressor' : XGBRegressor(),
+    'CatBoosting Regressor' :CatBoostRegressor(verbose=False),
+    'AdaBoost Regressor': AdaBoostRegressor(),
+    'Linear Regression': LinearRegression(),
+}
+
+
+""""
+The below code is written just for testing purpose
+import numpy as np
+# Sample data
+X = np.random.rand(100, 2)
+y = np.random.rand(100)
+
+if __name__ == "__main__":
+    model_manager = ModelManager(models)
+    model_selector = ModelSelector(model_manager)
+    result = model_selector.train_and_select_best_model(X, y)
+
+
+    print(result)
+    print(f"\n Best Model ==> [ {model_selector.get_best_model_name()} ]")
+"""
