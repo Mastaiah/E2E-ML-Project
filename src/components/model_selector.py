@@ -49,8 +49,13 @@ class ModelSelector:
         #Replace self.models.items() with self.models.models_list.item() if you are using the ModelManager class in the same file.
         for model_name, model in self.models.items():
             scores = cross_val_score(model, X, y, cv=cv, scoring=scoring)
-            rmse_scores = np.sqrt(-scores)
-            mean_score = rmse_scores.mean()
+
+            if scoring == 'neg_mean_squared_error':
+                rmse_scores = np.sqrt(-scores)
+                mean_score = rmse_scores.mean()
+            else:
+                mean_score = scores.mean()
+
             self.results[model_name] = mean_score
 
 
