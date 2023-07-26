@@ -14,11 +14,13 @@ from catboost import CatBoostRegressor
 from typing import Dict
 import pandas as pd
 import numpy as np
+from model_manager import ModelManager
 
-
+"""
 @dataclass
 class ModelManager:
     models_list: Dict[str, object] 
+"""
     
 
 class ModelSelector:
@@ -44,7 +46,8 @@ class ModelSelector:
         """
         best_score = float('-inf')
 
-        for model_name, model in self.models.models_list.items():
+        #Replace self.models.items() with self.models.models_list.item() if you are using the ModelManager class in the same file.
+        for model_name, model in self.models.items():
             scores = cross_val_score(model, X, y, cv=cv, scoring=scoring)
             rmse_scores = np.sqrt(-scores)
             mean_score = rmse_scores.mean()
@@ -68,7 +71,8 @@ class ModelSelector:
     def get_best_model_name(self):
         return self.best_model_name
     
-
+"""
+Uncomment this block if you want to use the below code in the same file. 
 # Create a dictionary of candidate models
 models = {
     'Random Forest': RandomForestRegressor(),
@@ -80,7 +84,7 @@ models = {
     'AdaBoost Regressor': AdaBoostRegressor(),
     'Linear Regression': LinearRegression(),
 }
-
+"""
 
 """
 #The below code is written just for testing purpose
@@ -90,11 +94,13 @@ X = np.random.rand(100, 2)
 y = np.random.rand(100)
 
 if __name__ == "__main__":
-    model_manager = ModelManager(models)
-    model_selector = ModelSelector(model_manager)
+    model_manager = ModelManager()
+    model = model_manager.get_models()
+    model_selector = ModelSelector(model)
     result = model_selector.train_and_select_best_model(X, y)
 
 
     print(result)
     print(f"\n Best Model ==> [ {model_selector.get_best_model_name()} ]")
+
 """
