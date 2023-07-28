@@ -63,11 +63,12 @@ class ModelSelector:
                 best_score = mean_score
                 self.best_model = model
                 self.best_model_name = model_name
-
+        
+        #Use pd.DataFrame.from_dict when there is a nested dictionary .                
         self.df = pd.DataFrame.from_dict(self.results ,orient='index',columns=['Value'])
         self.df.reset_index(inplace=True)
         self.df.rename(columns={'index': 'Model'}, inplace=True)
-       
+    
         return self.df
 
     def get_best_model(self):
@@ -107,5 +108,4 @@ if __name__ == "__main__":
 
     print(result)
     print(f"\n Best Model ==> [ {model_selector.get_best_model_name()} ]")
-
 """
