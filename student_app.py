@@ -1,8 +1,7 @@
-
-
 import pandas as pd
 from flask import Flask, request, render_template , redirect , url_for
-from pipeline.predict_pipeline import DataToPredict
+from pipeline.predict_pipeline import DataToPredict, Predicter
+
 
 
 student_performance = Flask(__name__,template_folder="html_templates")
@@ -34,10 +33,12 @@ def predict_data():
                                  writing_score = request.form.get('writing_score'),
                                  ) 
 
-        data_to_predict = cust_data.convert_to_data_frame()
+        features = cust_data.convert_to_data_frame()
+        data_perdicter = Predicter()
+        results = data_perdicter.predict(features)
 
-        print(data_to_predict)
-        return 
+
+        return render_tempalte ('home.html', results=results[0]) 
 
 if __name__ == "__main__":
     student_performance.run(host="0.0.0.0",debug=True)

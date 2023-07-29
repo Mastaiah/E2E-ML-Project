@@ -4,11 +4,11 @@ import pickle
 #import dill
 
 
-class ModelSaverLoader:
+class Saver:
     def __init__(self , model):
         self.model = model
 
-    def save_model(self, filepath ,format='pickle'):
+    def save(self, filepath ,format='pickle'):
         with open (filepath ,'wb') as file:
             if format =='pickle':
                 pickle.dump(self.model,file)
@@ -20,7 +20,11 @@ class ModelSaverLoader:
                 print("Unknown format \n")
 
 
-    def load_model(self,filepath):
+class Loader:
+    def __init__(self):
+        self.model = None
+
+    def load(self,filepath):
          # Extract the file extension using os.path.splitext()
         _ , stored_file_ext = os.path.splitext(filepath)
 

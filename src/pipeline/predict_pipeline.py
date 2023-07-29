@@ -1,5 +1,6 @@
 
 import os
+from utils.model_persistence import Loader
 
 #Data collector 
 class DataToPredict:
@@ -15,18 +16,34 @@ class DataToPredict:
 
 
     def convert_to_data_frame (self):
-        data_frame_dict = {'gender' : [self.gender],
+        data_dict = {'gender' : [self.gender],
                            'race_ethnicity' : [self.race_ethnicity],
                            'parental_level_of_education' : [self.parental_level_of_education],
                            'test_preparation_cours' : [self.test_preparation_course],
                            'reading_score' : [self.reading_score],
                            'writing_score' : [self.writing_score],
                            }
-        return pd.DataFrame(data_frame_dict)
+        return pd.DataFrame(data_dict)
 
 
-class PredictPipeline:
+class Predicter:
     def __init__(self):
-        self.preprocessor_path = os.model.path('artifacts','preprocessor.pkl')
+        self.preprocessor_path = os.path.join('artifacts','preprocessor.pkl')
         self.model_path = os.path.join('artifacts','model.pkl')
+    
+    def predict(self,features):
+        #Load the  preprocessor, process the new features.
+        preprocessor_object = Loader()
+        preprocessor = preprocessor_object.load(self.preprocessor_path)
+        processed_data = preprocessor.transform(features)
+
+        #Load the model , predict based on features provided. 
+        model_object = Loader()
+        model = model_object.load(self.model_path)
+        predicted_value = model.predict(processed_data)
+
+        return predicted_value
+        
+
+
         
