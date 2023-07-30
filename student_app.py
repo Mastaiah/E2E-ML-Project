@@ -37,7 +37,6 @@ def predict_data():
         data_perdicter = Predicter()
         results = data_perdicter.predict(features)
 
-
         return render_tempalte ('home.html', results=results[0]) 
 
 if __name__ == "__main__":

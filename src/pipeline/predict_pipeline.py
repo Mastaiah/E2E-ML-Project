@@ -40,10 +40,10 @@ class Predicter:
         #Load the model , predict based on features provided. 
         model_object = Loader()
         model = model_object.load(self.model_path)
-        predicted_value = model.predict(processed_data)
 
-        return predicted_value
-        
+        if model is None:
+            raise CustomException("Model didn't loaded . Unknown file format")
+        else:
+            predicted_value = model.predict(processed_data)
+            return predicted_value
 
-
-        

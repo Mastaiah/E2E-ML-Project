@@ -5,16 +5,18 @@ import pickle
 
 
 class Saver:
-    def __init__(self , model):
+    def __init__(self , model, filepath , format='pickle'):
         self.model = model
+        self.filepath = filepath
+        slef.format = format
 
-    def save(self, filepath ,format='pickle'):
-        with open (filepath ,'wb') as file:
-            if format =='pickle':
+    def save(self):
+        with open (self.filepath ,'wb') as file:
+            if self.format =='pickle':
                 pickle.dump(self.model,file)
                 # Use dill - to serialize more complex Python objects, including certain classes or functions.
                 #dill.dump(self.model, file)
-            elif format == 'joblib':
+            elif self.format == 'joblib':
                 joblib.dump(self.model,file)
             else:
                 print("Unknown format \n")
@@ -34,7 +36,10 @@ class Loader:
         elif stored_file_ext == ".joblib":
             self.model = joblib.dump(filepath)
         else:
+            self.model = None
             print("Unknown file extension.")
+
+        return self.model
 
 
 """
