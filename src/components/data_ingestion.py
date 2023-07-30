@@ -20,7 +20,7 @@ class DataIngestion:
         self.data_config = DataIngestionConfig()
 
     #function to initiate a data ingestion
-    def initiate_data_ingestion(self):
+    def initiate(self):
 
         try:    
             CustomLogger().info('Inititated the data ingestion')
@@ -54,5 +54,5 @@ class DataIngestion:
 
 
 if __name__ == "__main__":
-    obj = DataIngestion()
-    obj.initiate_data_ingestion()
+    data_ingestion = DataIngestion()
+    data_ingestion.initiate()

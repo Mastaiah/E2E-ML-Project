@@ -22,5 +22,4 @@ class HyperparameterTuner:
         else:
             hyperparameters = Saver(self.best_params, self.hyperparameter_path)
             hyperparameters.save()
-
-
+            return self.best_model
