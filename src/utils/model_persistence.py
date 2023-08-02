@@ -8,7 +8,7 @@ class Saver:
     def __init__(self , model, filepath , format='pickle'):
         self.model = model
         self.filepath = filepath
-        slef.format = format
+        self.format = format
 
     def save(self):
         with open (self.filepath ,'wb') as file:

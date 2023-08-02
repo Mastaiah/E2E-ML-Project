@@ -14,7 +14,7 @@ from catboost import CatBoostRegressor
 from typing import Dict
 import pandas as pd
 import numpy as np
-from model_manager import ModelManager
+#from model_manager import ModelManager
 
 """
 @dataclass
@@ -28,6 +28,7 @@ class ModelSelector:
         self.models = models
         self.best_model = None
         self.best_model_name = None
+        self.best_score = float('inf')
         self.results = {}
         self.df = None
 
@@ -44,23 +45,16 @@ class ModelSelector:
         Returns:
             None
         """
-        best_score = float('-inf')
 
         #Replace self.models.items() with self.models.models_list.item() if you are using the ModelManager class in the same file.
         for model_name, model in self.models.items():
             scores = cross_val_score(model, X, y, cv=cv, scoring=scoring)
-
-            if scoring == 'neg_mean_squared_error':
-                rmse_scores = np.sqrt(-scores)
-                mean_score = rmse_scores.mean()
-            else:
-                mean_score = scores.mean()
-
+            mean_score = -scores.mean()
             self.results[model_name] = mean_score
 
 
-            if mean_score > best_score:
-                best_score = mean_score
+            if mean_score < self.best_score:
+                self.best_score = mean_score
                 self.best_model = model
                 self.best_model_name = model_name
         
@@ -69,7 +63,7 @@ class ModelSelector:
         self.df.reset_index(inplace=True)
         self.df.rename(columns={'index': 'Model'}, inplace=True)
     
-        return self.df
+        return self.df , self.best_score
 
     def get_best_model(self):
         return self.best_model

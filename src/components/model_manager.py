@@ -3,6 +3,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.svm import SVR
+from sklearn.linear_model import Ridge, Lasso
 from sklearn.ensemble import (
     AdaBoostRegressor,
     GradientBoostingRegressor,
@@ -24,6 +25,9 @@ class ModelManager:
                                         'CatBoosting Regressor' :CatBoostRegressor(verbose=False),
                                         'AdaBoost Regressor': AdaBoostRegressor(),
                                         'Linear Regression': LinearRegression(),
+                                        'Ridge Regression': Ridge(),
+                                        'Lasso Regression': Lasso(),
+
                                     })
 
     def get_models(self)->dict:

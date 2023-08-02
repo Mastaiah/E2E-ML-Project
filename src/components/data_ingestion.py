@@ -8,6 +8,8 @@ from sklearn.model_selection import train_test_split
 from utils.exception import CustomException
 from utils.logger import CustomLogger
 
+
+
 #Decorator class
 @dataclass
 class DataIngestionConfig:
@@ -41,7 +43,6 @@ class DataIngestion:
                 test_data.to_csv(self.data_config.test_data_path,  index = False, header = True)
                 student_df.to_csv(self.data_config.raw_data_path, index = False, header = True)
 
-                
                 CustomLogger().info('Data ingestion completed')
 
                 return{
@@ -52,7 +53,8 @@ class DataIngestion:
         except CustomException as e:
                 CustomLogger.error(e)
 
-
+"""
 if __name__ == "__main__":
     data_ingestion = DataIngestion()
     data_ingestion.initiate()
+"""
