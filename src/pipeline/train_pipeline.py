@@ -6,6 +6,9 @@ from components.hyperparmeter_tuner import HyperparameterTuner
 from components.model_evaluator import ModelEvaluator , OverFittingDetector
 from sklearn.linear_model import Ridge
 from utils.logger import CustomLogger
+from utils.plotter import LearningCurvePlotter ,ValidationCurvePlotter
+import numpy as np
+
 
 class ModelTrainingPipeline:
     def __init__(self):
@@ -22,13 +25,14 @@ class ModelTrainingPipeline:
 
         
     def train(self , features, target):
-        #Modle selection and performing the hyperparameter tunning
+        #Model selection
         if self.model_selected_flag == False:
             self.models_list = self.model_mgr.get_models()
             model_obj = ModelSelector(self.models_list)
-            _ , self.val_score = model_obj.train_and_select_best_model(features, target)
+            model_list, self.val_score = model_obj.train_and_select_best_model(features, target)
             self.best_model = model_obj.get_best_model()
             self.best_model_name = model_obj.get_best_model_name()
+            print(f"{model_list}\n")
             print(f"Model Selected : {self.best_model_name}\n")
             if self.best_model is not None:
                 self.model_selected_flag = True
@@ -50,62 +54,75 @@ class ModelTrainingPipeline:
         train_mse, val_mse = self.overfitting.detect(self.best_model, x_train , y_train , x_val , y_val)
         return train_mse , val_mse
 
-    def hyperparameter_tune_and_fit(self , param_grid, features , target ):
-        self.best_model_hyper = self.hyper_obj.tune_hyperparameters(self.best_model, param_grid, features , target  )
+    def hyperparameter_tune_and_fit(self , param_grid, features , target , scoring ='neg_mean_squared_error',cv  = 5 ):
+        self.best_model_hyper = self.hyper_obj.tune_hyperparameters(self.best_model, param_grid, features , target ,scoring = scoring,cv = cv )
         print("Best Hyperparameters:",self.best_model.get_params())
+        print("Best model with hyperparameter:",self.best_model_hyper)
         #Fitting the model with hyperparameters
         print(f"**** Model Training with Hyperparameter Initated ****\n")
-        self.best_model_hyper.fit(x_train, y_train)
-        print(f"***  Model Training  with Hyperparameter Finished ****\n")
+        self.best_model_hyper.fit(features, target)
+        print(f"**** Model Training  with Hyperparameter Finished ****\n")
         
-
         return self.best_model
 
 
 if __name__ == "__main__":
     #Ingest the data 
     data_ingestion = DataIngestion()
-    train_data,test_data = data_ingestion.initiate()
+    raw_data_path = data_ingestion.initiate()
 
     #Preprocess the data
-    data_transformation=DataTransformation()
-    train_arr,test_arr,_ = data_transformation.initiate_data_transformation(train_data,test_data)
+    data_transformation = DataTransformation()
+    train_feat , val_feat , test_feat , train_target , val_target, test_target = data_transformation.initiate(raw_data_path, random_state=42)
 
-    print(type(train_arr))
-    X_train,y_train,X_test,y_test=(
-                train_arr[:,:-1],
-                train_arr[:,-1],
-                test_arr[:,:-1],
-                test_arr[:,-1]
-            )
     model = ModelTrainingPipeline()
-    model.train(X_train, y_train)
+    
+    model.train(train_feat, train_target)
 
-    mse, r2 , rmse , report = model.evaluate(X_train, y_train)
-    print("***** Pre-hyperparameter *****")
+    print("***** Pre-hyperparameter *****\n")
+    mse, r2 , rmse , report = model.evaluate(train_feat, train_target)
     print(f"Training evaluation  {report}")
-    mse,r2 ,rmse, report = model.evaluate(X_test,y_test)
-    print(f"Validation evaluation  {report}")
 
-    train_r2_score, val_r2_score = model.detect_overfitting(X_train, y_train, X_test ,y_test)
-    print (f"Training R2 Score   {train_r2_score:.2f}")
-    print (f"Validation R2 Score  {val_r2_score:.2f}")
+    train_mse, val_mse = model.detect_overfitting(train_feat, train_target, val_feat, val_target)
+    print (f"Training-MSE   {train_mse:.2f}")
+    print (f"Validation-MSE {val_mse:.2f}")
+
 
     params = {
-                'alpha': [0.01, 0.1, 1.0, 10.0], 
-                'selection': ['cyclic', 'random'],
+                'alpha': [ 0.01, 0.1, 1.0, 10.0], 
+                'solver': ['auto', 'svd', 'cholesky', 'lsqr', 'sparse_cg', 'sag', 'saga'],
              }
 
-    result = model.hyperparameter_tune_and_fit(params,X_train, y_train)
+    model_with_hyperparameter = model.hyperparameter_tune_and_fit(params, train_feat, train_target, cv = 10)
     
-    mse, r2 , rmse , report = model.evaluate(X_train, y_train)
+    train_mse, train_r2, train_rmse, train_report = model.evaluate(train_feat , train_target)
+    val_mse, val_r2 , val_rmse , val_report = model.evaluate(val_feat, val_target)
     print("***** Post-hyperparameter *****")
-    print(f"Training evaluation : {report}")
+    print(f"Training evaluation : {train_report}\n")
+    print(f"Validation evalutation:{val_report}")
 
-    mse,r2 ,rmse, report = model.evaluate(X_test,y_test)
-    print(f"Validation evaluation : {report}")
 
-    train_r2_score, val_r2_score = model.detect_overfitting(X_train, y_train, X_test ,y_test)
-    print (f"Training R2 Score  : {train_r2_score:.2f}")
-    print (f"Validation R2 Score : {val_r2_score:.2f}")
+    train_mse, val_mse = model.detect_overfitting(train_feat, train_target, val_feat , val_target)
+    print (f"Training-MSE   {train_mse:.2f}")
+    print (f"Validation-MSE  {val_mse:.2f}")
 
+
+    if train_mse < val_mse:
+        print("Warning: Model might be overfitting.")
+    else:
+        print("Model seems to generalize well.")
+
+
+    # Set up Learning Plotter
+    train_sizes = np.linspace(0.1, 1.0, 5)  # Fraction of the dataset used for training
+    plotter = LearningCurvePlotter(model_with_hyperparameter, train_feat, train_target, train_sizes, cv = 10)
+
+    # Plot the learning curve
+    plotter.plot_learning_curve()   
+
+
+    #Set up validation plotter
+    val_plotter = ValidationCurvePlotter(model_with_hyperparameter, train_feat, 
+                train_target, param_name="alpha", param_range=params.get('alpha'), cv = 10)
+    
+    val_plotter.plot_validation_curve()

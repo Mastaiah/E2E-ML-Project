@@ -25,9 +25,9 @@ class ModelManager:
                                         'CatBoosting Regressor' :CatBoostRegressor(verbose=False),
                                         'AdaBoost Regressor': AdaBoostRegressor(),
                                         'Linear Regression': LinearRegression(),
-                                        'Ridge Regression': Ridge(),
                                         'Lasso Regression': Lasso(),
-
+                                        'Ridge Regression': Ridge(),
+                                       
                                     })
 
     def get_models(self)->dict:

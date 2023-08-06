@@ -16,7 +16,7 @@ class OverFittingDetector:
         self.y_train = y_train
         self.x_val = x_val
         self.y_val = y_val
-        self.model.fit(self.x_train, self.y_train)
+        #self.model.fit(self.x_train, self.y_train)
         y_train_pred = self.model.predict(self.x_train)
         y_val_pred = self.model.predict(self.x_val)
 

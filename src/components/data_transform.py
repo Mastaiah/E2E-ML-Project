@@ -1,67 +1,59 @@
-
+import os
 from dataclasses import dataclass
-
 import numpy as np 
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder,StandardScaler
-
 from utils.exception import CustomException
-from utils.logger import logging
-import os
-
+from utils.logger import CustomLogger
+from components.data_splitter import DataSplitter
 from utils.model_persistence  import Saver
 
 @dataclass
 class DataTransformationConfig:
-    preprocessor_obj_file_path=os.path.join('artifacts',"proprocessor.pkl")
+    preprocessor_file_path=os.path.join('artifacts',"proprocessor.pkl")
 
 class DataTransformation:
     def __init__(self):
-        self.data_transformation_config=DataTransformationConfig()
+        self.data_transformation_config = DataTransformationConfig()
+        self.transformed = False
+        self.raw_df = None
+        self.data_splitter = None
+    
 
-    def get_data_transformer_object(self):
+    def data_transformer(self,data):
         '''
-        This function si responsible for data trnasformation
+        This function is responsible for data transformation
         
         '''
         try:
-            numerical_columns = ["writing_score", "reading_score"]
-            categorical_columns = [
-                "gender",
-                "race_ethnicity",
-                "parental_level_of_education",
-                "lunch",
-                "test_preparation_course",
-            ]
+            numerical_columns = data.select_dtypes(include=[float, int]).columns.tolist()
+            categorical_columns = data.select_dtypes(include=[object]).columns.tolist()
 
-            num_pipeline= Pipeline(
-                steps=[
-                ("imputer",SimpleImputer(strategy="median")),
-                ("scaler",StandardScaler())
-
-                ]
+            num_pipeline = Pipeline(
+                steps = [
+                        ("imputer",SimpleImputer(strategy="median")),
+                        ("scaler",StandardScaler())
+                        ]
             )
 
-            cat_pipeline=Pipeline(
-
-                steps=[
-                ("imputer",SimpleImputer(strategy="most_frequent")),
-                ("one_hot_encoder",OneHotEncoder()),
-                ("scaler",StandardScaler(with_mean=False))
-                ]
-
+            cat_pipeline = Pipeline(
+                steps = [
+                        ("imputer",SimpleImputer(strategy="most_frequent")),
+                        ("one_hot_encoder",OneHotEncoder()),
+                        ("scaler",StandardScaler(with_mean=False))
+                        ]
             )
 
-            logging.info(f"Categorical columns: {categorical_columns}")
-            logging.info(f"Numerical columns: {numerical_columns}")
+            #logging.info(f"Categorical columns: {categorical_columns}")
+            #logging.info(f"Numerical columns: {numerical_columns}")
 
-            preprocessor=ColumnTransformer(
+            preprocessor = ColumnTransformer(
                 [
-                ("num_pipeline",num_pipeline,numerical_columns),
-                ("cat_pipelines",cat_pipeline,categorical_columns)
+                ("numerical_pipeline", num_pipeline, numerical_columns),
+                ("categorical_pipeline", cat_pipeline, categorical_columns)
 
                 ]
 
@@ -72,50 +64,47 @@ class DataTransformation:
         except Exception as e:
             raise CustomException(e)
         
-    def initiate_data_transformation(self,train_path,test_path):
-
-        try:
-            train_df=pd.read_csv(train_path)
-            test_df=pd.read_csv(test_path)
-
-            logging.info("Read train and test data completed")
-
-            logging.info("Obtaining preprocessing object")
-
-            preprocessing_obj=self.get_data_transformer_object()
-
-            target_column_name="math_score"
-            numerical_columns = ["writing_score", "reading_score"]
-
-            input_feature_train_df=train_df.drop(columns=[target_column_name],axis=1)
-            target_feature_train_df=train_df[target_column_name]
-
-            input_feature_test_df=test_df.drop(columns=[target_column_name],axis=1)
-            target_feature_test_df=test_df[target_column_name]
-
+    def initiate(self,data_path ,val_size = 0.20, test_size = 0.10 ,random_state= None):
         
+        try:
+            self.raw_df = pd.read_csv(data_path)
+            self.data_splitter = DataSplitter()
 
-            logging.info(
-                f"Applying preprocessing object on training dataframe and testing dataframe."
-            )
+            CustomLogger().info('Reading data completed....data preprocessing is about to start!!!')
 
-            input_feature_train_arr=preprocessing_obj.fit_transform(input_feature_train_df)
-            input_feature_test_arr=preprocessing_obj.transform(input_feature_test_df)
+            target_name = "math_score"
 
-            train_arr = np.c_[
-                input_feature_train_arr, np.array(target_feature_train_df)
-            ]
-            test_arr = np.c_[input_feature_test_arr, np.array(target_feature_test_df)]
+            features = self.raw_df.drop(columns=[target_name],axis=1)
+            target  = self.raw_df[target_name]
 
-            logging.info(f"Saved preprocessing object.")
+            train_feat , val_feat , test_feat , train_target , val_target, test_target = self.data_splitter.split_data(features, target,val_size , test_size, random_state)
 
-            processed_data = Saver( preprocessing_obj , self.data_transformation_config.preprocessor_obj_file_path)
+            preprocessing = self.data_transformer(train_feat)
+            #Fit and transform on  training data 
+            train_feature_processed = preprocessing.fit_transform(train_feat)
+
+            #Transform on validation and test data.
+            val_feature_processed = preprocessing.transform(val_feat)
+            test_feature_processed = preprocessing.transform(test_feat)
+
+            CustomLogger().info(f"Saving preprocessing details.")
+
+            processed_data = Saver( preprocessing , self.data_transformation_config.preprocessor_file_path)
+
+            CustomLogger().info("Saved preprocessing details")
 
 
-            return (
-                train_arr,
-                test_arr,
-                self.data_transformation_config.preprocessor_obj_file_path,
-            )
+            return ( train_feature_processed , 
+                     val_feature_processed,
+                     test_feature_processed,
+                     train_target,
+                     val_target,
+                     test_target,
+                 )
+        
         except Exception as e:
             raise CustomException(e)
+      
+
+    def is_transformed(self):
+        return self.transformed

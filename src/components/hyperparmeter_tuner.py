@@ -17,8 +17,9 @@ class HyperparameterTuner:
         self.param_grid = param_grid
         self.scoring = scoring
         self.cv = cv
+        #Use GridSearchCV for hyperparameter tuning with cross-validation
         grid_search = GridSearchCV(self.model , param_grid=self.param_grid ,cv=self.cv ,scoring=self.scoring)
-        grid_search.fit(x_train,y_train)
+        grid_search.fit(x_train, y_train)
         self.best_model = grid_search.best_estimator_
         self.best_params = self.best_model.get_params()
 

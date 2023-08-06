@@ -52,7 +52,6 @@ class ModelSelector:
             mean_score = -scores.mean()
             self.results[model_name] = mean_score
 
-
             if mean_score < self.best_score:
                 self.best_score = mean_score
                 self.best_model = model
