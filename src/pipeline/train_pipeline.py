@@ -38,9 +38,10 @@ class ModelTrainingPipeline:
                 self.model_selected_flag = True
                 print(f"**** Model Training Initated ****\n")
                 self.best_model.fit(features,target)
-                print(f"***  Model Training Finished ****\n")
+                print(f"**** Model Training Finished ****\n")
             else:
                 print("Failed to select the Model.")
+                self.model_selected_flag = False
 
             return self.val_score
 
@@ -59,7 +60,7 @@ class ModelTrainingPipeline:
         print("Best Hyperparameters:",self.best_model.get_params())
         print("Best model with hyperparameter:",self.best_model_hyper)
         #Fitting the model with hyperparameters
-        print(f"**** Model Training with Hyperparameter Initated ****\n")
+        print(f"\n**** Model Training with Hyperparameter Initated ****\n")
         self.best_model_hyper.fit(features, target)
         print(f"**** Model Training  with Hyperparameter Finished ****\n")
         
@@ -85,7 +86,7 @@ if __name__ == "__main__":
 
     train_mse, val_mse = model.detect_overfitting(train_feat, train_target, val_feat, val_target)
     print (f"Training-MSE   {train_mse:.2f}")
-    print (f"Validation-MSE {val_mse:.2f}")
+    print (f"Validation-MSE {val_mse:.2f}\n")
 
 
     params = {
@@ -98,7 +99,7 @@ if __name__ == "__main__":
     train_mse, train_r2, train_rmse, train_report = model.evaluate(train_feat , train_target)
     val_mse, val_r2 , val_rmse , val_report = model.evaluate(val_feat, val_target)
     print("***** Post-hyperparameter *****")
-    print(f"Training evaluation : {train_report}\n")
+    print(f"Training evaluation : {train_report}")
     print(f"Validation evalutation:{val_report}")
 
 
@@ -108,9 +109,9 @@ if __name__ == "__main__":
 
 
     if train_mse < val_mse:
-        print("Warning: Model might be overfitting.")
+        print("Warning: Model might be overfitting.\n")
     else:
-        print("Model seems to generalize well.")
+        print("Model seems to generalize well.\n")
 
 
     # Set up Learning Plotter

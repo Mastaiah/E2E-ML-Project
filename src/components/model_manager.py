@@ -27,7 +27,6 @@ class ModelManager:
                                         'Linear Regression': LinearRegression(),
                                         'Lasso Regression': Lasso(),
                                         'Ridge Regression': Ridge(),
-                                       
                                     })
 
     def get_models(self)->dict:
